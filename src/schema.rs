@@ -143,14 +143,13 @@ pub struct ProductRegulationsBlock {
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct GermanRegulations {
-    #[serde(default)]
-    pub uba_positive: bool,
+    pub uba_relevant: Option<bool>,
+    pub uba_compliant: Option<bool>,
 }
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct WeeeRegulations {
-    #[serde(default)]
     pub weee_number: Option<String>,
 }
 

@@ -127,6 +127,15 @@ pub struct BasePackage {
 pub struct DangerousGoods {
     #[serde(default)]
     pub contains_dangerous_goods: bool,
+    pub tunnel_restriction_code: Option<String>,
+    pub water_hazard_class: Option<String>,
+    #[serde(default)]
+    pub limited_quantity: bool,
+
+    pub battery_weight: Option<Decimal>,
+
+    #[serde(default)]
+    pub hazard_labels: Vec<String>,
 }
 
 pub const PRODUCT_REGULATIONS_BLOCK_URN: &str = "urn:sib:product-regulations-1";
@@ -138,6 +147,8 @@ pub struct ProductRegulationsBlock {
     pub weee: Option<WeeeRegulations>,
     pub reach: Option<ReachRegulations>,
     pub clp: Option<ClpRegulations>,
+    pub battery: Option<BatteryRegulations>,
+    pub erp: Option<ErpRegulations>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -157,11 +168,18 @@ pub struct WeeeRegulations {
 #[serde(rename_all = "camelCase")]
 pub struct ReachRegulations {
     #[serde(default)]
+    pub is_subject_to_reach: bool,
+    pub scip_number: Option<String>,
+    #[serde(default)]
     pub svhc_contents: Vec<SVHCContent>,
 }
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct SVHCContent {}
+pub struct SVHCContent {
+    pub substance_name: String,
+    pub cas_number: Option<String>,
+    pub concentration: Option<String>,
+}
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -172,4 +190,52 @@ pub struct ClpRegulations {
     pub signal_word_warning: bool,
     #[serde(default)]
     pub signal_word_danger: bool,
+    #[serde(default)]
+    pub b2b_only: bool,
+
+    #[serde(default)]
+    pub hazard_statements: Vec<String>,
+    #[serde(default)]
+    pub precautionary_statements: Vec<String>,
+    #[serde(default)]
+    pub pictograms: Vec<String>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct BatteryRegulations {
+    #[serde(default)]
+    pub contains_battery: bool,
+    #[serde(default)]
+    pub batteries: Vec<Battery>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Battery {
+    pub battery_pictogram: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ErpRegulations {
+    pub seasonal_space_heating: Option<String>,
+    pub seasonal_space_heating_medium_temp_55_c: Option<String>,
+    pub seasonal_space_heating_low_temp_35_c: Option<String>,
+    pub water_heating: Option<String>,
+    pub seasonal_space_heating_package: Option<String>,
+    pub seasonal_combined_heating_package: Option<String>,
+    pub hot_water_storage_tank: Option<String>,
+    pub cooling: Option<String>,
+    pub heating_colder_climate: Option<String>,
+    pub heating_average_climate: Option<String>,
+    pub heating_warmer_climate: Option<String>,
+    pub solid_fuel_boiler: Option<String>,
+    pub solid_fuel_package: Option<String>,
+    pub lamp: Option<String>,
+    pub luminaire_approved_range: Option<String>,
+    pub led_approved_range: Option<String>,
+    pub light_source_20192015: Option<String>,
+    pub local_space_heater: Option<String>,
+    pub two_direction_ventilation_unit: Option<String>,
 }

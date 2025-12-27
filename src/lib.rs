@@ -18,17 +18,21 @@ pub struct Block {
 }
 
 pub struct SibResponse {
+    url: String,
     blocks: HashMap<String, Block>,
 }
 
 impl SibResponse {
-    pub fn get_block<'a, T>(&'a self, block_type: &str) -> Option<T>
+    pub fn get_block<'s, T>(&'s self, block_type: &str) -> anyhow::Result<Option<T>>
     where
-        T: Deserialize<'a>,
+        T: Deserialize<'s>,
     {
-        self.blocks
-            .get(block_type)
-            .and_then(|block| T::deserialize(&block.data).ok())
+        match self.blocks.get(block_type) {
+            Some(block) => T::deserialize(&block.data)
+                .with_context(|| format!("Failed to deserialize {} for {}", block_type, &self.url))
+                .map(|data| Some(data)),
+            None => Ok(None),
+        }
     }
 }
 
@@ -50,6 +54,7 @@ pub async fn query_sib(
         HeaderValue::from_static("application/json"),
     );
 
+    let original_url = url.to_owned();
     let url = Url::parse(url)
         .ok()
         .map(|mut url| {
@@ -83,5 +88,8 @@ pub async fn query_sib(
         .map(|block| (block.block_type.clone(), block))
         .collect::<HashMap<String, Block>>();
 
-    Ok(SibResponse { blocks })
+    Ok(SibResponse {
+        url: original_url,
+        blocks,
+    })
 }

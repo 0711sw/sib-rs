@@ -23,8 +23,8 @@ pub async fn fetch_product_info(url: &str, source: Option<&str>) -> anyhow::Resu
     )
     .await?;
 
-    let base_block = result.get_block::<ProductBaseBlock>(PRODUCT_BASE_BLOCK_URN);
-    let brand_block = result.get_block::<ProductBrandBlock>(PRODUCT_BRAND_BLOCK_URN);
+    let base_block = result.get_block::<ProductBaseBlock>(PRODUCT_BASE_BLOCK_URN)?;
+    let brand_block = result.get_block::<ProductBrandBlock>(PRODUCT_BRAND_BLOCK_URN)?;
 
     Ok(ProductInfo {
         item_number: base_block

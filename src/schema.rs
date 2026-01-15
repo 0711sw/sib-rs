@@ -219,23 +219,13 @@ pub struct Battery {
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ErpRegulations {
-    pub seasonal_space_heating: Option<String>,
-    pub seasonal_space_heating_medium_temp_55_c: Option<String>,
-    pub seasonal_space_heating_low_temp_35_c: Option<String>,
-    pub water_heating: Option<String>,
-    pub seasonal_space_heating_package: Option<String>,
-    pub seasonal_combined_heating_package: Option<String>,
-    pub hot_water_storage_tank: Option<String>,
-    pub cooling: Option<String>,
-    pub heating_colder_climate: Option<String>,
-    pub heating_average_climate: Option<String>,
-    pub heating_warmer_climate: Option<String>,
-    pub solid_fuel_boiler: Option<String>,
-    pub solid_fuel_package: Option<String>,
-    pub lamp: Option<String>,
-    pub luminaire_approved_range: Option<String>,
-    pub led_approved_range: Option<String>,
-    pub light_source_20192015: Option<String>,
-    pub local_space_heater: Option<String>,
-    pub two_direction_ventilation_unit: Option<String>,
+    #[serde(default)]
+    pub classifications: Vec<ErpClassification>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ErpClassification {
+    pub category: String,
+    pub class: String,
 }

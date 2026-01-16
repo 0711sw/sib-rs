@@ -1,20 +1,36 @@
+//! High-level product information retrieval.
+//!
+//! This module provides a simplified API for fetching basic product information
+//! without needing to work with individual SIB blocks.
+
 use crate::query_sib;
 use crate::schema::{
     PRODUCT_BASE_BLOCK_URN, PRODUCT_BRAND_BLOCK_URN, ProductBaseBlock, ProductBrandBlock,
 };
 use serde::Serialize;
 
+/// Simplified product information combining data from multiple blocks.
 #[derive(Serialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct ProductInfo {
+    /// Unique product identifier.
     pub item_number: Option<String>,
+    /// Model number.
     pub model: Option<String>,
+    /// Short product description.
     pub short_description: Option<String>,
+    /// URL to the main product image (small thumbnail).
     pub main_image_url: Option<String>,
+    /// URL to the brand logo (small thumbnail).
     pub brand_logo_url: Option<String>,
+    /// Brand name.
     pub brand_name: Option<String>,
 }
 
+/// Fetch simplified product information from a SIB endpoint.
+///
+/// This function queries the ProductBase and ProductBrand blocks and combines
+/// them into a single [`ProductInfo`] struct with the most commonly needed fields.
 pub async fn fetch_product_info(url: &str, source: Option<&str>) -> anyhow::Result<ProductInfo> {
     let result = query_sib(
         url,

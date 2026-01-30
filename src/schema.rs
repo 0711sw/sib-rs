@@ -15,6 +15,7 @@
 //! - **Maintenance blocks**: FAQ, maintenance schedules, and life cycle assessment (experimental)
 //! - **Links block**: Entity linking for external system integration
 
+use crate::BlockDescriptor;
 use chrono::NaiveDate;
 use rust_decimal::Decimal;
 use serde::Deserialize;
@@ -77,6 +78,12 @@ pub struct ProductBaseBlock {
     pub variant_group: Option<String>,
 }
 
+impl BlockDescriptor for ProductBaseBlock {
+    fn urn() -> &'static str {
+        PRODUCT_BASE_BLOCK_URN
+    }
+}
+
 // =============================================================================
 // urn:sib:item-base-1 - Physical item-specific data (Experimental)
 // =============================================================================
@@ -92,6 +99,12 @@ pub struct ItemBaseBlock {
     pub serial_number: Option<String>,
     /// Manufacturing date.
     pub manufactured_at: Option<NaiveDate>,
+}
+
+impl BlockDescriptor for ItemBaseBlock {
+    fn urn() -> &'static str {
+        ITEM_BASE_BLOCK_URN
+    }
 }
 
 // =============================================================================
@@ -117,6 +130,12 @@ pub struct ProductBrandBlock {
     pub manufacturer: Option<CompanyInfo>,
     /// Distributor information.
     pub distributor: Option<CompanyInfo>,
+}
+
+impl BlockDescriptor for ProductBrandBlock {
+    fn urn() -> &'static str {
+        PRODUCT_BRAND_BLOCK_URN
+    }
 }
 
 /// Company contact information for manufacturer or distributor.
@@ -152,6 +171,12 @@ pub struct ProductTextsBlock {
     pub usage_note_html: Option<String>,
 }
 
+impl BlockDescriptor for ProductTextsBlock {
+    fn urn() -> &'static str {
+        PRODUCT_TEXTS_BLOCK_URN
+    }
+}
+
 // =============================================================================
 // urn:sib:product-attributes-1 - Custom product attributes
 // =============================================================================
@@ -166,6 +191,12 @@ pub struct ProductAttributesBlock {
     /// List of custom attributes.
     #[serde(default)]
     pub attributes: Vec<ProductAttribute>,
+}
+
+impl BlockDescriptor for ProductAttributesBlock {
+    fn urn() -> &'static str {
+        PRODUCT_ATTRIBUTES_BLOCK_URN
+    }
 }
 
 /// A custom product attribute with label and value.
@@ -192,6 +223,12 @@ pub struct ProductFeaturesBlock {
     /// List of classification systems with their features.
     #[serde(default)]
     pub systems: Vec<FeatureSystem>,
+}
+
+impl BlockDescriptor for ProductFeaturesBlock {
+    fn urn() -> &'static str {
+        PRODUCT_FEATURES_BLOCK_URN
+    }
 }
 
 /// A classification system with its features.
@@ -239,6 +276,12 @@ pub struct ProductImagesBlock {
     pub images: Vec<ProductImage>,
 }
 
+impl BlockDescriptor for ProductImagesBlock {
+    fn urn() -> &'static str {
+        PRODUCT_IMAGES_BLOCK_URN
+    }
+}
+
 /// A product image with metadata.
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -278,6 +321,12 @@ pub struct ProductRelationsBlock {
     /// Components that make up this product.
     #[serde(default)]
     pub components: Vec<Component>,
+}
+
+impl BlockDescriptor for ProductRelationsBlock {
+    fn urn() -> &'static str {
+        PRODUCT_RELATIONS_BLOCK_URN
+    }
 }
 
 /// A successor/replacement product.
@@ -374,6 +423,12 @@ pub struct ProductDocumentsBlock {
     pub documents: Vec<Document>,
 }
 
+impl BlockDescriptor for ProductDocumentsBlock {
+    fn urn() -> &'static str {
+        PRODUCT_DOCUMENTS_BLOCK_URN
+    }
+}
+
 /// A product document with metadata.
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -431,6 +486,12 @@ pub struct ProductLogisticsBlock {
     pub base_package: Option<BasePackage>,
     /// Dangerous goods information.
     pub dangerous_goods: Option<DangerousGoods>,
+}
+
+impl BlockDescriptor for ProductLogisticsBlock {
+    fn urn() -> &'static str {
+        PRODUCT_LOGISTICS_BLOCK_URN
+    }
 }
 
 /// Package dimensions and weight.
@@ -512,6 +573,12 @@ pub struct ProductRegulationsBlock {
     pub battery: Option<BatteryRegulations>,
     /// ERP (Energy-related Products) regulations.
     pub erp: Option<ErpRegulations>,
+}
+
+impl BlockDescriptor for ProductRegulationsBlock {
+    fn urn() -> &'static str {
+        PRODUCT_REGULATIONS_BLOCK_URN
+    }
 }
 
 /// German UBA (Umweltbundesamt) regulations.
@@ -671,6 +738,12 @@ pub struct ProductFaqBlock {
     pub faqs: Vec<FaqEntry>,
 }
 
+impl BlockDescriptor for ProductFaqBlock {
+    fn urn() -> &'static str {
+        PRODUCT_FAQ_BLOCK_URN
+    }
+}
+
 /// A frequently asked question with answer.
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -710,6 +783,12 @@ pub struct ProductMaintenanceBlock {
     /// List of maintenance tasks.
     #[serde(default)]
     pub maintenance_tasks: Vec<MaintenanceTask>,
+}
+
+impl BlockDescriptor for ProductMaintenanceBlock {
+    fn urn() -> &'static str {
+        PRODUCT_MAINTENANCE_BLOCK_URN
+    }
 }
 
 /// Product replacement cycle information.
@@ -793,6 +872,12 @@ pub struct ProductLcaBlock {
     /// Environmental impact indicators.
     #[serde(default)]
     pub impacts: Vec<LcaImpact>,
+}
+
+impl BlockDescriptor for ProductLcaBlock {
+    fn urn() -> &'static str {
+        PRODUCT_LCA_BLOCK_URN
+    }
 }
 
 /// An LCA scenario.
@@ -944,6 +1029,12 @@ pub struct LinksBlock {
     pub uplinks: Vec<EntityLink>,
     /// Effective date of the links.
     pub effective_date: Option<NaiveDate>,
+}
+
+impl BlockDescriptor for LinksBlock {
+    fn urn() -> &'static str {
+        LINKS_BLOCK_URN
+    }
 }
 
 /// A link to an external entity.

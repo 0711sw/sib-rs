@@ -37,7 +37,17 @@
     clippy::indexing_slicing
 )]
 // Relax some lints for test code
-#![cfg_attr(test, allow(unused_results, dead_code, unused_imports, missing_docs))]
+#![cfg_attr(
+    test,
+    allow(
+        unused_results,
+        missing_docs,
+        clippy::unwrap_used,
+        clippy::expect_used,
+        clippy::panic,
+        clippy::indexing_slicing
+    )
+)]
 
 use anyhow::Context;
 use chrono::{DateTime, NaiveDate, Utc};

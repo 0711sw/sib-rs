@@ -92,13 +92,33 @@ impl BlockDescriptor for ProductBaseBlock {
 pub const ITEM_BASE_BLOCK_URN: &str = "urn:sib:item-base-1";
 
 /// Physical item-specific data for individual product instances.
+///
+/// Contains identification data specific to a single physical item, as opposed to
+/// product-level data that applies to all items of the same type.
+///
+/// The fields correspond to the IDTA 02006-3-0-1 Digital Nameplate submodel template.
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct ItemBaseBlock {
     /// Serial number of the individual item.
     pub serial_number: Option<String>,
+    /// Unique identifier of the production batch.
+    /// Semantic ID: 0112/2///61360_7#ABB002#001
+    pub batch_number: Option<String>,
     /// Manufacturing date.
+    /// Semantic ID: 0173-1#02-AAR972#002
     pub manufactured_at: Option<NaiveDate>,
+    /// Version of the hardware supplied with the device.
+    /// Semantic ID: 0173-1#02-AAN270#002
+    pub hardware_version: Option<String>,
+    /// Version of the firmware installed on the device.
+    /// Semantic ID: 0173-1#02-AAM985#002
+    pub firmware_version: Option<String>,
+    /// Version of the software installed on the device.
+    /// Semantic ID: 0173-1#02-AAM737#002
+    pub software_version: Option<String>,
+    /// Identification of the manufacturing facility or production site.
+    pub facility_marking: Option<String>,
 }
 
 impl BlockDescriptor for ItemBaseBlock {
@@ -703,10 +723,12 @@ pub struct Battery {
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct ErpRegulations {
-    /// EU energy label image.
-    pub erp_label: Option<Asset>,
-    /// Product datasheet for energy labeling.
-    pub erp_datasheet: Option<Asset>,
+    /// EU energy label images (multiple for different markets/variants).
+    #[serde(default)]
+    pub erp_label: Vec<Asset>,
+    /// Product datasheets for energy labeling (multiple for different markets/variants).
+    #[serde(default)]
+    pub erp_datasheet: Vec<Asset>,
     /// Energy efficiency classifications.
     #[serde(default)]
     pub classifications: Vec<ErpClassification>,

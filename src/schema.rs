@@ -24,6 +24,9 @@ use serde::Deserialize;
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct Asset {
+    /// The asset ID as filename (e.g., "9256438534JHASGDF.jpg").
+    /// Used for deduplication across different URL variants of the same asset.
+    pub asset_filename: Option<String>,
     /// File size in bytes.
     #[serde(rename = "contentSize")]
     pub content_size: u64,

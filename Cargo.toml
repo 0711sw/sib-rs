@@ -4,6 +4,12 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+# NOTE: arbitrary_precision on serde_json + serde-arbitrary-precision on rust_decimal
+# are both required for correct parsing of Decimal values from JSON.
+# However, there is a known bug in rust_decimal where visit_f64 (used by serde_json's
+# Value deserializer for numbers that fit in f64) fails on scientific notation
+# (e.g. 5.06e-6). See get_block() in lib.rs for the workaround.
+# Upstream: https://github.com/paupino/rust-decimal/issues/722
 serde_json = { version = "1.0", features = ["arbitrary_precision"] }
 serde = { version = "1.0", features = ["derive"] }
 reqwest = { version = "0.12", features = ["json"] }

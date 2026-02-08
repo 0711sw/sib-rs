@@ -185,14 +185,36 @@ impl SibResponse {
     ///     println!("Product: {}", base.item_number.unwrap_or_default());
     /// }
     /// ```
-    pub fn get_block<'s, D>(&'s self) -> anyhow::Result<Option<D>>
+    pub fn get_block<D>(&self) -> anyhow::Result<Option<D>>
     where
-        D: Deserialize<'s> + BlockDescriptor,
+        D: serde::de::DeserializeOwned + BlockDescriptor,
     {
         match self.blocks.get(D::urn()) {
-            Some(block) => D::deserialize(&block.data)
-                .with_context(|| format!("Failed to deserialize {} for {}", D::urn(), &self.url))
-                .map(Some),
+            Some(block) => {
+                // WORKAROUND: Roundtrip through JSON string to use serde_json's stream
+                // deserializer instead of the Value deserializer.
+                //
+                // The Value deserializer in serde_json (with `arbitrary_precision`) tries
+                // visit_f64 for numbers that roundtrip as f64 before falling back to
+                // visit_map. rust_decimal's visit_f64 (with `serde-arbitrary-precision`)
+                // uses ryu, which formats small numbers in scientific notation (e.g. "5.06e-6").
+                // Decimal::from_str cannot parse scientific notation → deserialization fails.
+                //
+                // The stream deserializer does not have this problem: non-integer numbers
+                // always go through visit_map → DecimalFromString → from_scientific fallback.
+                //
+                // Upstream issues:
+                //   - https://github.com/paupino/rust-decimal/issues/722 (from_str + scientific)
+                //   - https://github.com/paupino/rust-decimal/issues/760 (serde_json roundtrip)
+                //
+                // This workaround can be removed once rust_decimal's visit_f64 handles
+                // scientific notation or from_str supports it natively.
+                let json = serde_json::to_string(&block.data)
+                    .with_context(|| format!("Failed to serialize {} for {}", D::urn(), &self.url))?;
+                serde_json::from_str(&json)
+                    .with_context(|| format!("Failed to deserialize {} for {}", D::urn(), &self.url))
+                    .map(Some)
+            }
             None => Ok(None),
         }
     }
@@ -431,4 +453,137 @@ pub async fn query_sib(
         version: response.version,
         cluster_id: response.cluster_id,
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use rust_decimal::Decimal;
+    use schema::{ProductLcaBlock, ProductLogisticsBlock};
+    use std::str::FromStr;
+
+    fn d(s: &str) -> Decimal {
+        Decimal::from_str(s).unwrap()
+    }
+
+    /// Verifies that scientific notation decimals (e.g. 5.06e-6) are correctly
+    /// deserialized through get_block. This is a regression test for a bug where
+    /// serde_json's Value deserializer routes f64-representable numbers through
+    /// visit_f64, and rust_decimal's visit_f64 fails on scientific notation
+    /// produced by ryu.
+    #[test]
+    fn get_block_handles_scientific_notation_in_lca() {
+        let response = SibResponse::empty()
+            .with_block_json::<ProductLcaBlock>(
+                r#"{
+                    "declaredUnitQuantity": 1,
+                    "declaredUnitUnit": "KGM",
+                    "impacts": [{
+                        "stage": "A1-A3",
+                        "declared": true,
+                        "GWP_FOSSIL": 5.06e-6,
+                        "GWP_BIOGENIC": -1.23e-10,
+                        "ODP": 3.45e-15,
+                        "AP": 0.00000789
+                    }]
+                }"#,
+            )
+            .unwrap();
+
+        let block = response
+            .get_block::<ProductLcaBlock>()
+            .expect("deserialization must not fail")
+            .expect("block must be present");
+
+        assert_eq!(block.impacts.len(), 1);
+        let impact = &block.impacts[0];
+        assert_eq!(impact.stage, "A1-A3");
+        assert_eq!(impact.gwp_fossil, Some(d("0.00000506")));
+        assert_eq!(impact.odp, Some(d("0.00000000000000345")));
+        assert_eq!(impact.ap, Some(d("0.00000789")));
+    }
+
+    /// Verifies that trailing-zero decimals like 67.000000 are correctly
+    /// deserialized. These fail with the Value deserializer because
+    /// serde_json's f64 roundtrip check (format_finite(67.0) = "67.0") does
+    /// not match the raw string "67.000000", causing it to fall through to
+    /// visit_map which requires serde-arbitrary-precision.
+    #[test]
+    fn get_block_handles_trailing_zero_decimals_in_logistics() {
+        let response = SibResponse::empty()
+            .with_block_json::<ProductLogisticsBlock>(
+                r#"{
+                    "shelfLife": 24.000000,
+                    "numberOfPackages": 1.00,
+                    "basePackage": {
+                        "length": 400.000000,
+                        "width": 200.000000,
+                        "height": 87.000000,
+                        "weight": 2.500000
+                    }
+                }"#,
+            )
+            .unwrap();
+
+        let block = response
+            .get_block::<ProductLogisticsBlock>()
+            .expect("deserialization must not fail")
+            .expect("block must be present");
+
+        assert_eq!(block.shelf_life, Some(d("24.000000")));
+        assert_eq!(block.number_of_packages, Some(d("1.00")));
+
+        let pkg = block.base_package.expect("basePackage must be present");
+        assert_eq!(pkg.height, Some(d("87.000000")));
+        assert_eq!(pkg.weight, Some(d("2.500000")));
+    }
+
+    /// Verifies that both scientific notation and trailing-zero decimals work
+    /// together in the same block, as they would in real SIB data.
+    #[test]
+    fn get_block_handles_mixed_decimal_formats_in_lca() {
+        let response = SibResponse::empty()
+            .with_block_json::<ProductLcaBlock>(
+                r#"{
+                    "declaredUnitQuantity": 1.000000,
+                    "declaredUnitUnit": "PCE",
+                    "referenceServiceLife": 50.00,
+                    "impacts": [
+                        {
+                            "stage": "A1-A3",
+                            "declared": true,
+                            "GWP_TOTAL": 123.456000,
+                            "GWP_FOSSIL": 1.2e2,
+                            "EP_FRESHWATER": 9.87e-8,
+                            "PERE": 0.00,
+                            "SM": 0
+                        },
+                        {
+                            "stage": "D",
+                            "declared": true,
+                            "GWP_TOTAL": -4.56e-3
+                        }
+                    ]
+                }"#,
+            )
+            .unwrap();
+
+        let block = response
+            .get_block::<ProductLcaBlock>()
+            .expect("deserialization must not fail")
+            .expect("block must be present");
+
+        assert_eq!(block.declared_unit_quantity, d("1.000000"));
+        assert_eq!(block.reference_service_life, Some(d("50.00")));
+        assert_eq!(block.impacts.len(), 2);
+
+        let a = &block.impacts[0];
+        assert_eq!(a.gwp_total, Some(d("123.456000")));
+        assert_eq!(a.gwp_fossil, Some(d("120")));
+        assert_eq!(a.pere, Some(d("0.00")));
+        assert_eq!(a.sm, Some(d("0")));
+
+        let stage_d = &block.impacts[1];
+        assert_eq!(stage_d.gwp_total, Some(d("-0.00456")));
+    }
 }

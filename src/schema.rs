@@ -541,10 +541,8 @@ pub struct DangerousGoods {
     /// UN numbers (4-digit codes).
     #[serde(default)]
     pub un_numbers: Vec<String>,
-    /// ADR hazard class (1-9).
+    /// ADR hazard class, e.g. "3" for flammable liquids or "2.1" for flammable gases.
     pub hazard_class: Option<String>,
-    /// Hazard division (e.g., "1", "2").
-    pub hazard_division: Option<String>,
     /// Transport category (0-4).
     pub transport_category: Option<String>,
     /// Hazard identification number (Kemler code).

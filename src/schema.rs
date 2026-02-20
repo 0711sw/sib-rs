@@ -871,18 +871,28 @@ pub struct ProductLcaBlock {
     pub epd_id: Option<String>,
     /// EPD version.
     pub epd_version: Option<String>,
+    /// Public registration number assigned by the programme operator.
+    pub registration_number: Option<String>,
+    /// Name of the programme operator that published the EPD.
+    pub programme_operator: Option<String>,
     /// EPD title (may be translated).
     pub title: Option<String>,
-    /// Publication date.
+    /// Initial publication date of the EPD.
     pub published_at: Option<NaiveDate>,
+    /// Date of the most recent revision of the EPD.
+    pub version_date: Option<NaiveDate>,
     /// Validity start date.
     pub valid_from: Option<NaiveDate>,
     /// Validity end date.
     pub valid_to: Option<NaiveDate>,
-    /// Declared unit quantity.
-    pub declared_unit_quantity: Decimal,
+    /// Declared unit quantity (optional — some EPDs use only functional unit).
+    pub declared_unit_quantity: Option<Decimal>,
     /// Declared unit: PCE, KGM, MTK, MTQ, MTR, KWH, or SET.
-    pub declared_unit_unit: String,
+    pub declared_unit_unit: Option<String>,
+    /// Functional unit quantity.
+    pub functional_unit_quantity: Option<Decimal>,
+    /// Functional unit: PCE, KGM, MTK, MTQ, MTR, KWH, or SET.
+    pub functional_unit_unit: Option<String>,
     /// Functional unit description.
     pub functional_unit_description: Option<String>,
     /// Reference service life in years.
@@ -1015,6 +1025,12 @@ pub struct LcaImpact {
     /// Materials for Energy Recovery (kg).
     #[serde(rename = "MER")]
     pub mer: Option<Decimal>,
+    /// Exported electrical energy (MJ).
+    #[serde(rename = "EEE")]
+    pub eee: Option<Decimal>,
+    /// Exported thermal energy (MJ).
+    #[serde(rename = "EET")]
+    pub eet: Option<Decimal>,
     // Additional indicators
     /// Particulate Matter emissions (disease incidence).
     #[serde(rename = "PM")]

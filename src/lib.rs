@@ -573,7 +573,7 @@ mod tests {
             .expect("deserialization must not fail")
             .expect("block must be present");
 
-        assert_eq!(block.declared_unit_quantity, d("1.000000"));
+        assert_eq!(block.declared_unit_quantity, Some(d("1.000000")));
         assert_eq!(block.reference_service_life, Some(d("50.00")));
         assert_eq!(block.impacts.len(), 2);
 

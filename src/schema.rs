@@ -881,8 +881,6 @@ pub struct ProductLcaBlock {
     pub published_at: Option<NaiveDate>,
     /// Date of the most recent revision of the EPD.
     pub version_date: Option<NaiveDate>,
-    /// Validity start date.
-    pub valid_from: Option<NaiveDate>,
     /// Validity end date.
     pub valid_to: Option<NaiveDate>,
     /// Declared unit quantity (optional — some EPDs use only functional unit).

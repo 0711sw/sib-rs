@@ -482,8 +482,10 @@ pub struct Document {
     /// Document type identifier.
     #[serde(rename = "type")]
     pub document_type: String,
-    /// The document file.
-    pub document: Asset,
+    /// The document file. Either `document` or `url` should be provided; the asset is preferred.
+    pub document: Option<Asset>,
+    /// URL fallback when no document asset is available. Asset is preferred when both are set.
+    pub url: Option<String>,
     /// ISO 639-1 language codes for the document content.
     #[serde(default)]
     pub content_languages: Vec<String>,

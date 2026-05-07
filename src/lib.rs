@@ -52,8 +52,8 @@
 use anyhow::Context;
 use chrono::{DateTime, NaiveDate, Utc};
 use http::HeaderValue;
-use reqwest::header::HeaderMap;
 use reqwest::Client;
+use reqwest::header::HeaderMap;
 use serde::Deserialize;
 use serde_json::Value;
 use std::collections::HashMap;
@@ -209,10 +209,13 @@ impl SibResponse {
                 //
                 // This workaround can be removed once rust_decimal's visit_f64 handles
                 // scientific notation or from_str supports it natively.
-                let json = serde_json::to_string(&block.data)
-                    .with_context(|| format!("Failed to serialize {} for {}", D::urn(), &self.url))?;
+                let json = serde_json::to_string(&block.data).with_context(|| {
+                    format!("Failed to serialize {} for {}", D::urn(), &self.url)
+                })?;
                 serde_json::from_str(&json)
-                    .with_context(|| format!("Failed to deserialize {} for {}", D::urn(), &self.url))
+                    .with_context(|| {
+                        format!("Failed to deserialize {} for {}", D::urn(), &self.url)
+                    })
                     .map(Some)
             }
             None => Ok(None),

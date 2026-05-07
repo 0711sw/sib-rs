@@ -321,6 +321,27 @@ pub struct ProductImage {
     pub content_languages: Vec<String>,
 }
 
+/// Image type: Product image, color (DQR: B_, BMDG: P01).
+pub const IMAGE_TYPE_COLORED_IMAGE: &str = "COLORED_IMAGE";
+/// Image type: Product image, black & white (DQR: S_).
+pub const IMAGE_TYPE_BW_IMAGE: &str = "BW_IMAGE";
+/// Image type: Dimensioned drawing (DQR: V_, BMDG: P08).
+pub const IMAGE_TYPE_MEASURED_DRAWING: &str = "MEASURED_DRAWING";
+/// Image type: Exploded drawing (DQR: X_, BMDG: P10).
+pub const IMAGE_TYPE_EXPLODED_DRAWING: &str = "EXPLODED_DRAWING";
+/// Image type: Line drawing (DQR: U_, BMDG: P07).
+pub const IMAGE_TYPE_DRAWING: &str = "DRAWING";
+/// Image type: Detailed view (DQR: DT, BMDG: P13).
+pub const IMAGE_TYPE_DETAILED_IMAGE: &str = "DETAILED_IMAGE";
+/// Image type: Logo (DQR: LO, BMDG: P05).
+pub const IMAGE_TYPE_LOGO: &str = "LOGO";
+/// Image type: Pictogram/icon.
+pub const IMAGE_TYPE_ICON: &str = "ICON";
+/// Image type: Energy icon.
+pub const IMAGE_TYPE_ERP_ICON: &str = "ERP_ICON";
+/// Image type: Seal of approval.
+pub const IMAGE_TYPE_SEAL_OF_APPROVAL: &str = "SEAL_OF_APPROVAL";
+
 // =============================================================================
 // urn:sib:product-relations-1 - Product relationships
 // =============================================================================
@@ -468,18 +489,90 @@ pub struct Document {
     pub content_languages: Vec<String>,
 }
 
-/// Document type for installation manuals.
-pub const DOCUMENT_TYPE_INSTALLATION_MANUAL: &str = "INSTALLATION_MANUAL";
-/// Document type for maintenance manuals.
-pub const DOCUMENT_TYPE_MAINTENANCE_MANUAL: &str = "MAINTENANCE_MANUAL";
-/// Document type for maintenance instructions.
-pub const DOCUMENT_TYPE_MAINTENANCE_INSTRUCTION: &str = "MAINTENANCE_INSTRUCTION";
-/// Document type for planning documents.
-pub const DOCUMENT_TYPE_PLANNING: &str = "PLANNING";
-/// Document type for EU energy labels.
-pub const DOCUMENT_TYPE_ENERGY_LABEL: &str = "ENERGY_LABEL";
-/// Document type for Material Safety Data Sheets.
+/// Document type: Safety data sheet (DQR: GG, BMDG: S02).
 pub const DOCUMENT_TYPE_MSDS: &str = "MSDS";
+/// Document type: Product data sheet (DQR: DB).
+pub const DOCUMENT_TYPE_ITEM_DATASHEET: &str = "ITEM_DATASHEET";
+/// Document type: Technical data sheet (BMDG: S01).
+pub const DOCUMENT_TYPE_TECHNICAL_DATASHEET: &str = "TECHNICAL_DATASHEET";
+/// Document type: Wiring diagram (BMDG: P12).
+pub const DOCUMENT_TYPE_WIRING_DIAGRAM: &str = "WIRING_DIAGRAM";
+/// Document type: Circuit diagram (DQR: SB).
+pub const DOCUMENT_TYPE_CIRCUIT_DIAGRAM: &str = "CIRCUIT_DIAGRAM";
+/// Document type: Technical drawing (DQR: TZ).
+pub const DOCUMENT_TYPE_TECHNICAL_DRAWING: &str = "TECHNICAL_DRAWING";
+/// Document type: Declaration of performance (DQR: LE, BMDG: D03).
+pub const DOCUMENT_TYPE_DOP: &str = "DOP";
+/// Document type: RoHS declaration (BMDG: D01).
+pub const DOCUMENT_TYPE_ROHS: &str = "ROHS";
+/// Document type: Declaration of Conformity (BMDG: D02).
+pub const DOCUMENT_TYPE_COC: &str = "COC";
+/// Document type: Declaration of conformity CE (DQR: CE, BMDG: D04).
+pub const DOCUMENT_TYPE_DOC: &str = "DOC";
+/// Document type: Warranty statement (BMDG: D05).
+pub const DOCUMENT_TYPE_WARRANTY: &str = "WARRANTY";
+/// Document type: REACH declaration (BMDG: D06).
+pub const DOCUMENT_TYPE_REACH: &str = "REACH";
+/// Document type: WEEE declaration (BMDG: D07).
+pub const DOCUMENT_TYPE_WEEE: &str = "WEEE";
+/// Document type: Approval (DQR: ZL).
+pub const DOCUMENT_TYPE_APPROVAL: &str = "APPROVAL";
+/// Document type: Luminaire data.
+pub const DOCUMENT_TYPE_LUMINAIRE_DATA: &str = "LUMINAIRE_DATA";
+/// Document type: Light cone diagram.
+pub const DOCUMENT_TYPE_LIGHT_CONE_DIAGRAM: &str = "LIGHT_CONE_DIAGRAM";
+/// Document type: Light distribution curve.
+pub const DOCUMENT_TYPE_LIGHT_DISTRIBUTION_CURVE: &str = "LIGHT_DISTRIBUTION_CURVE";
+/// Document type: Installation manual (DQR: MA, BMDG: M01).
+pub const DOCUMENT_TYPE_INSTALLATION_MANUAL: &str = "INSTALLATION_MANUAL";
+/// Document type: Planning instructions (DQR: PA).
+pub const DOCUMENT_TYPE_PLANNING: &str = "PLANNING";
+/// Document type: User manual (DQR: IS, BMDG: M02).
+pub const DOCUMENT_TYPE_USER_MANUAL: &str = "USER_MANUAL";
+/// Document type: Maintenance manual (DQR: WA, BMDG: M03).
+pub const DOCUMENT_TYPE_MAINTENANCE_MANUAL: &str = "MAINTENANCE_MANUAL";
+/// Document type: Maintenance instructions (DQR: PF).
+pub const DOCUMENT_TYPE_MAINTENANCE_INSTRUCTION: &str = "MAINTENANCE_INSTRUCTION";
+/// Document type: Other manual (BMDG: M04).
+pub const DOCUMENT_TYPE_OTHER_MANUAL: &str = "OTHER_MANUAL";
+/// Document type: Spare parts list.
+pub const DOCUMENT_TYPE_SPARE_PARTS_LIST: &str = "SPARE_PARTS_LIST";
+/// Document type: IE motor efficiency (BMDG: L02).
+pub const DOCUMENT_TYPE_MOTOR_EFFICIENCY: &str = "MOTOR_EFFICIENCY";
+/// Document type: ECO Label (BMDG: L03).
+pub const DOCUMENT_TYPE_ECO_LABEL: &str = "ECO_LABEL";
+/// Document type: UBA list (DQR: UP).
+pub const DOCUMENT_TYPE_UBA_LIST: &str = "UBA_LIST";
+/// Document type: Approval for drinking water (BMDG: A01).
+pub const DOCUMENT_TYPE_ACS: &str = "ACS";
+/// Document type: Approval for Ex classification (DQR: EX, BMDG: A02).
+pub const DOCUMENT_TYPE_EXPLOSION_PROTECTION: &str = "EXPLOSION_PROTECTION";
+/// Document type: Other approval/certificate (BMDG: A03).
+pub const DOCUMENT_TYPE_CERTIFICATE: &str = "CERTIFICATE";
+/// Document type: Certificate of sustainability (DQR: NZ).
+pub const DOCUMENT_TYPE_CERTIFICATE_SUSTAINABILITY: &str = "CERTIFICATE_SUSTAINABILITY";
+/// Document type: WELL label (DQR: WL).
+pub const DOCUMENT_TYPE_WELL_LABEL: &str = "WELL_LABEL";
+/// Document type: Fire protection (DQR: BS).
+pub const DOCUMENT_TYPE_FIRE_PROTECTION: &str = "FIRE_PROTECTION";
+/// Document type: Corrosion protection (DQR: KS).
+pub const DOCUMENT_TYPE_CORROSION_PROTECTION: &str = "CORROSION_PROTECTION";
+/// Document type: VdS approval (DQR: VD).
+pub const DOCUMENT_TYPE_VDS_APPROVAL: &str = "VDS_APPROVAL";
+/// Document type: Noise protection verification (DQR: SS).
+pub const DOCUMENT_TYPE_NOISE_PROTECTION_VERIFICATION: &str = "NOISE_PROTECTION_VERIFICATION";
+/// Document type: Test report lithium batteries (DQR: PL, BMDG: S03).
+pub const DOCUMENT_TYPE_TEST_REPORT_LITHIUM_BATTERY: &str = "TEST_REPORT_LITHIUM_BATTERY";
+/// Document type: Environmental product declaration / EPD (DQR: EPD).
+pub const DOCUMENT_TYPE_ENVIRONMENTAL_PRODUCT_DECLARATION: &str =
+    "ENVIRONMENTAL_PRODUCT_DECLARATION";
+/// Document type: Environmental code of practice (ECOP).
+pub const DOCUMENT_TYPE_ENVIRONMENTAL_CODE_OF_PRACTICE: &str = "ENVIRONMENTAL_CODE_OF_PRACTICE";
+/// Document type: German sustainable building quality seal (DQR: QNG).
+pub const DOCUMENT_TYPE_SUSTAINABLE_BUILDING_QUALITY_SEAL: &str =
+    "SUSTAINABLE_BUILDING_QUALITY_SEAL";
+/// Document type: EU Data Act.
+pub const DOCUMENT_TYPE_EU_DATA_ACT: &str = "EU_DATA_ACT";
 
 impl ProductDocumentsBlock {
     /// Find a document by its type identifier.

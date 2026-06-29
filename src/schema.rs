@@ -416,8 +416,8 @@ pub struct SparepartsDrawing {
 pub struct Sparepart {
     /// Position number in drawing.
     pub number: Option<String>,
-    /// Item number of the spare part.
-    pub item_number: String,
+    /// Item number of the spare part. May be left blank for text-only descriptions.
+    pub item_number: Option<String>,
     /// Description (may be translated).
     pub short_description: Option<String>,
 }

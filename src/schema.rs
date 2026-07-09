@@ -49,6 +49,26 @@ pub struct Asset {
     pub url: Option<String>,
 }
 
+impl Asset {
+    /// Canonical asset id — the filename without its extension.
+    ///
+    /// This is the id the asset is stored and vector-indexed under
+    /// (`<tenant>/<asset_id>.pdf`). Query-time consumers must derive the id the
+    /// same way the indexer does — from `asset_filename`, **not** by parsing it
+    /// out of `url` — or the two keys drift apart and lookups silently miss.
+    /// Returns `None` when the asset has no filename.
+    pub fn asset_id(&self) -> Option<String> {
+        let name = self.asset_filename.as_ref()?;
+        let stem = name
+            .rsplit_once('.')
+            .map_or(name.as_str(), |(base, _ext)| base);
+        if stem.is_empty() {
+            return None;
+        }
+        Some(stem.to_string())
+    }
+}
+
 // =============================================================================
 // urn:sib:product-base-1 - Core product identification
 // =============================================================================
@@ -489,6 +509,25 @@ pub struct Document {
     /// ISO 639-1 language codes for the document content.
     #[serde(default)]
     pub content_languages: Vec<String>,
+}
+
+impl Document {
+    /// The uploaded asset backing this document, if any.
+    ///
+    /// A `Document` carries *either* an uploaded `document` asset — hosted by
+    /// us under `/asset/v1/...` and the only kind we thumbnail, deep-link and
+    /// vector-index — *or* only an external `url` fallback. Consumers that need
+    /// a real, hosted file should go through this method rather than reading
+    /// `url` directly. Mirrors the `isAsset = !!doc.document` check in the UIs.
+    pub fn asset(&self) -> Option<&Asset> {
+        self.document.as_ref()
+    }
+
+    /// Whether this document is backed by an uploaded asset (as opposed to
+    /// carrying only an external `url`). See [`Document::asset`].
+    pub fn is_asset_backed(&self) -> bool {
+        self.document.is_some()
+    }
 }
 
 /// Document type: Safety data sheet (DQR: GG, BMDG: S02).
